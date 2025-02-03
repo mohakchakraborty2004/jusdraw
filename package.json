@@ -10,11 +10,11 @@
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.5",
-    "konva": "^9.3.18",
+    "konva": "^8.4.3",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
-    "react-konva": "^19.0.2"
+    "react-konva": "^18.2.10"
   },
   "devDependencies": {
     "@types/node": "^20",
