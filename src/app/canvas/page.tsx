@@ -1,6 +1,6 @@
 "use client"; 
-import { Stage, Layer, Line, Rect, Circle, Ellipse } from "react-konva";
-import { useState, useRef } from "react";
+import { Stage, Layer, Line, Rect, Circle, Ellipse, Text } from "react-konva";
+import { useState, useRef, useEffect } from "react";
 
 export default function DrawSpace() {
     const [isDrawing, setIsDrawing] = useState(false);
@@ -8,9 +8,14 @@ export default function DrawSpace() {
     const [tool, setTool] = useState("pen");
     const [rectangle, setRect] = useState<any[]>([]);
     const [circle, setCircle] = useState<any[]>([]);
+    const [texts, setTexts] = useState<any[]>([]);
     const [strokeColor, setColor] = useState("white");
     const [strokeWidth, setWidth] = useState(3); 
+    const [fontSize, setFontSize] = useState(20);
+    const [textInput, setTextInput] = useState("");
+    const [textPosition, setTextPosition] = useState({ x: 0, y: 0 });
     const stageRef = useRef(null);
+    const textInputRef = useRef<HTMLInputElement>(null);
     const [currentShape, setCurrentShape] = useState<any>(null);
 
     const handleMouseDown = (e : any) => {
@@ -48,6 +53,28 @@ export default function DrawSpace() {
                 stroke: strokeColor,
                 strokeWidth: strokeWidth
             });
+        } else if (tool === "text") {
+            // Position the text input at the click location
+            setTextPosition({ x: pos.x, y: pos.y });
+            // Focus on the input
+            setTimeout(() => {
+                textInputRef.current?.focus();
+            }, 0);
+        }
+    }
+
+    const handleTextInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && textInput.trim()) {
+            // Add text to texts array
+            setTexts([...texts, {
+                x: textPosition.x,
+                y: textPosition.y,
+                text: textInput,
+                fontSize: fontSize,
+                fill: strokeColor
+            }]);
+            // Clear the input
+            setTextInput("");
         }
     }
 
@@ -110,12 +137,13 @@ export default function DrawSpace() {
     }
 
     return (
-        <div className="bg-black h-screen">
+        <div className="bg-black h-screen relative">
             <div className="flex gap-2 p-2 bg-gray-800 text-white">
                 <button onClick={() => setTool("pen")}>✏️ Pen</button>
                 <button onClick={() => setTool("eraser")}>🧽 Eraser</button>
                 <button onClick={() => setTool("rect")}>⬛ Rect</button>
                 <button onClick={() => setTool("circle")}>⚫ Circle</button>
+                <button onClick={() => setTool("text")}>📝 Text</button>
                 <input 
                     type="color" 
                     value={strokeColor} 
@@ -130,7 +158,37 @@ export default function DrawSpace() {
                     onChange={(e) => setWidth(parseInt(e.target.value))} 
                     className="bg-gray-700"
                 />
+                <input 
+                    type="number" 
+                    min="10" 
+                    max="50" 
+                    value={fontSize} 
+                    onChange={(e) => setFontSize(parseInt(e.target.value))} 
+                    className="bg-gray-700 w-16"
+                    placeholder="Font Size"
+                />
             </div>
+
+            {tool === "text" && (
+                <input 
+                    ref={textInputRef}
+                    type="text" 
+                    value={textInput}
+                    onChange={(e) => setTextInput(e.target.value)}
+                    onKeyDown={handleTextInputKeyDown}
+                    placeholder="Type text here"
+                    style={{
+                        position: 'absolute', 
+                        left: `${textPosition.x}px`, 
+                        top: `${textPosition.y}px`, 
+                        color: strokeColor,
+                        backgroundColor: 'transparent',
+                        border: `1px solid ${strokeColor}`,
+                        fontSize: `${fontSize}px`
+                    }}
+                    className="outline-none"
+                />
+            )}
 
             <Stage
                 ref={stageRef}
@@ -175,6 +233,17 @@ export default function DrawSpace() {
                             stroke={crl.stroke}
                             strokeWidth={crl.strokeWidth}
                             fill="transparent"
+                        />
+                    ))}
+
+                    {texts.map((txt, i) => (
+                        <Text
+                            key={i}
+                            x={txt.x}
+                            y={txt.y}
+                            text={txt.text}
+                            fontSize={txt.fontSize}
+                            fill={txt.fill}
                         />
                     ))}
 
