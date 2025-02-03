@@ -54,9 +54,9 @@ export default function DrawSpace() {
                 strokeWidth: strokeWidth
             });
         } else if (tool === "text") {
-            // Position the text input at the click location
+           
             setTextPosition({ x: pos.x, y: pos.y });
-            // Focus on the input
+        
             setTimeout(() => {
                 textInputRef.current?.focus();
             }, 0);
@@ -65,7 +65,7 @@ export default function DrawSpace() {
 
     const handleTextInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && textInput.trim()) {
-            // Add text to texts array
+    
             setTexts([...texts, {
                 x: textPosition.x,
                 y: textPosition.y,
@@ -192,8 +192,8 @@ export default function DrawSpace() {
 
             <Stage
                 ref={stageRef}
-                width={window.innerWidth}
-                height={window.innerHeight - 50}
+                width={800}
+                height={600}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
